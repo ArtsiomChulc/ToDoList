@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { v1 } from 'uuid';
 import './App.css';
 import { Todolist } from './Todolist';
+
+
+export type FilterValueType = 'all' | 'active' | 'completed';
+
 
 function App() {
 
@@ -18,38 +23,38 @@ function App() {
 
     let [tasks1, setTasks] = useState(
         [
-            { id: 1, title: "HTML&CSS", isDone: true },
-            { id: 2, title: "JS", isDone: true },
-            { id: 3, title: "ReactJS", isDone: false },
-            { id: 4, title: "Redux", isDone: false }
+            { id: v1(), title: "HTML&CSS", isDone: true },
+            { id: v1(), title: "JS", isDone: true },
+            { id: v1(), title: "ReactJS", isDone: false },
+            { id: v1(), title: "Redux", isDone: false }
         ]
     )
+    let [filterValue, setFilterValue] = useState<FilterValueType>('all');
 
-    // const filterTask = (name: string) => {
-    //     setFilterValue(name)
-
-    //     console.log(name);
-    // }
-
-    // let [filterValue, setFilterValue] = useState('All');
-
-    // let filteredTask = tasks1;
-    // if (filterValue === 'Active') {
-    //     filteredTask = tasks1.filter((el) => el.isDone)
-    // }
-    // if (filterValue === 'Completed') {
-    //     filteredTask = tasks1.filter((el) => !el.isDone)
-    // }
+    let filteredTask = tasks1;
+    if (filterValue === 'active') {
+        filteredTask = tasks1.filter((el) => el.isDone)
+    }
+    if (filterValue === 'completed') {
+        filteredTask = tasks1.filter((el) => !el.isDone)
+    }
     // if (filterValue === 'All') {
     //     filteredTask = tasks1;
     // }
 
+    const filterTask = (value: FilterValueType) => {
+        setFilterValue(value);
+    }
 
+    const addTask = (newTitle: string) => {
+        const newTask = { id: v1(), title: newTitle, isDone: false };
+        setTasks([newTask, ...tasks1]);
 
+    }
 
-    const removeTask = (id: number) => {
+    const removeTask = (id: string) => {
         // tasks1 = tasks1.filter((el) => el.id !== id); //! используем useState для перерисовки 
-        setTasks(tasks1.filter((el) => el.id !== id));
+        setTasks(filteredTask.filter((el) => el.id !== id));
     }
 
 
@@ -60,9 +65,10 @@ function App() {
     return (
         <div className="App">
             <Todolist title="What to learn"
-                tasks={tasks1}
+                tasks={filteredTask}
                 removeTask={removeTask}
-
+                addTask={addTask}
+                filterTask={filterTask}
             />
             {/* <Todolist title="Songs" tasks={tasks2} /> */}
         </div>
